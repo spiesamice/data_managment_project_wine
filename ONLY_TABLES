@@ -1,0 +1,144 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema group07db
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema group07db
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `group07db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
+USE `group07db` ;
+
+-- -----------------------------------------------------
+-- Table `group07db`.`farmers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`farmers` (
+  `farmerid` INT NOT NULL,
+  `farmeremail` VARCHAR(100) NULL DEFAULT NULL,
+  `farmerphone` VARCHAR(20) NULL DEFAULT NULL,
+  PRIMARY KEY (`farmerid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`agri_company`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`agri_company` (
+  `agri_companyid` INT NOT NULL,
+  `farmerid` INT NULL DEFAULT NULL,
+  `companyname` VARCHAR(100) NULL DEFAULT NULL,
+  `location` VARCHAR(30) NULL DEFAULT NULL,
+  `farmers_farmerid` INT NOT NULL,
+  PRIMARY KEY (`agri_companyid`),
+  INDEX `fk_agri_company_farmers1_idx` (`farmers_farmerid` ASC) VISIBLE,
+  CONSTRAINT `fk_agri_company_farmers1`
+    FOREIGN KEY (`farmers_farmerid`)
+    REFERENCES `group07db`.`farmers` (`farmerid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`genotypes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`genotypes` (
+  `genoid` INT NOT NULL,
+  `crop_name` VARCHAR(45) NULL DEFAULT NULL,
+  `acidity` DECIMAL(10,6) NULL DEFAULT NULL,
+  `tss` DECIMAL(10,5) NULL DEFAULT NULL,
+  `skinthickness` DECIMAL(10,5) NULL DEFAULT NULL,
+  `berry_score` DECIMAL(10,6) NULL DEFAULT NULL,
+  PRIMARY KEY (`genoid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`field`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`field` (
+  `fieldid` INT NOT NULL,
+  `fieldarea` DECIMAL(10,2) NULL DEFAULT NULL,
+  `fieldbio` TINYINT(1) NULL DEFAULT NULL,
+  `agri_company_agri_companyid` INT NOT NULL,
+  `genotypes_genoid` INT NOT NULL,
+  PRIMARY KEY (`fieldid`, `agri_company_agri_companyid`, `genotypes_genoid`),
+  INDEX `fk_field_agri_company1_idx` (`agri_company_agri_companyid` ASC) VISIBLE,
+  INDEX `fk_field_genotypes1_idx` (`genotypes_genoid` ASC) VISIBLE,
+  CONSTRAINT `fk_field_agri_company1`
+    FOREIGN KEY (`agri_company_agri_companyid`)
+    REFERENCES `group07db`.`agri_company` (`agri_companyid`),
+  CONSTRAINT `fk_field_genotypes1`
+    FOREIGN KEY (`genotypes_genoid`)
+    REFERENCES `group07db`.`genotypes` (`genoid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`wine_company`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`wine_company` (
+  `wine_companyid` INT NOT NULL,
+  `wine_company_name` VARCHAR(45) NULL DEFAULT NULL,
+  `wine_company_location` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`wine_companyid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`products` (
+  `productid` INT NOT NULL,
+  `product_name` VARCHAR(45) NULL DEFAULT NULL,
+  `product_value` INT NULL DEFAULT NULL,
+  `wine_company_wine_companyid` INT NOT NULL,
+  PRIMARY KEY (`productid`),
+  INDEX `fk_products_wine_company1_idx` (`wine_company_wine_companyid` ASC) VISIBLE,
+  CONSTRAINT `fk_products_wine_company1`
+    FOREIGN KEY (`wine_company_wine_companyid`)
+    REFERENCES `group07db`.`wine_company` (`wine_companyid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+-- -----------------------------------------------------
+-- Table `group07db`.`genotypes_in_product`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `group07db`.`genotypes_in_product` (
+  `genotypes_genoid` INT NOT NULL,
+  `products_productid` INT NOT NULL,
+  `ratio` DECIMAL(3,0) NULL DEFAULT NULL,
+  PRIMARY KEY (`genotypes_genoid`, `products_productid`),
+  INDEX `fk_genotypes_in_product_products1_idx` (`products_productid` ASC) VISIBLE,
+  CONSTRAINT `fk_genotypes_in_product_genotypes`
+    FOREIGN KEY (`genotypes_genoid`)
+    REFERENCES `group07db`.`genotypes` (`genoid`),
+  CONSTRAINT `fk_genotypes_in_product_products1`
+    FOREIGN KEY (`products_productid`)
+    REFERENCES `group07db`.`products` (`productid`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
