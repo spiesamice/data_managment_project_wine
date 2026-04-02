@@ -1,0 +1,19 @@
+import mysql.connector
+import matplotlib.pyplot as plt
+
+mysql_db_host = "data-management-server-3.cbxlqxkadwhn.us-east-1.rds.amazonaws.com"
+mysql_db_user = "FlorisDupont"
+mysql_db_passwd = "083fc38f57208d6897817c1ca81e97b7e55fecd6"
+mysql_db_root_schema = "dbFlorisDupont"
+mysql_db_port = 3306
+
+if __name__ == "__main__":
+
+    db = mysql.connector.connect(
+        host=mysql_db_host,
+        user=mysql_db_user,
+        passwd=mysql_db_passwd,
+        db=mysql_db_root_schema,
+        port=mysql_db_port
+    )
+    cursor = db.cursor()
